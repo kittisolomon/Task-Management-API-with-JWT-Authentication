@@ -3,11 +3,39 @@
 require 'cors.php';
 require "db_con.php";
 
-$data = json_decode(file_get_contents("php://input"));
+require "../vendor/autoload.php";
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+use \Firebase\JWT\ExpiredException;
+
+//$data = json_decode(file_get_contents("php://input"));
 
 $id = $_GET['id'];
 
 if($_SERVER['REQUEST_METHOD'] === 'PUT'){
+
+    $header = apache_request_headers();
+
+    if(!isset($header['Authorization'])){
+    
+      echo $response = json_encode(['status'=>'error', 'code'=>'401', 'message'=>'Access to this end-point denied!']);
+      return;
+    
+    }else{
+    
+      $header = $header['Authorization'];
+    
+    try{
+    
+    $algorithm = "HS256";
+     
+    $secret_key = "s5ZS5tgjh";
+    
+    $decode = JWT::decode($header, new Key($secret_key, $algorithm));
+    
+     $token_expire_time = $decode->exp;
+    
+     $current_time = time();
 
 if(empty($data->task_title) && empty($data->task_description)){
 
@@ -31,6 +59,19 @@ if(empty($data->task_title) && empty($data->task_description)){
 
     	echo $response = json_encode(['status'=>'error', 'code' => '500', 'message'=> 'Error Occured, Please Try Again!']);
     }
+
+}catch (ExpiredException $expiredException){
+
+    echo $response = json_encode(['status'=>'error', 'code'=>'401', 'message'=>'Token expired, Please login.']);
+      return;
+} catch (Exception $e){
+  
+    echo $response = json_encode(['status'=>'error', 'code'=>'401', 'message'=>'Error decoding or verifying token.']);
+      return;
+  
+  }
+  
+  }
 
     }else{
    echo  $response = json_encode(['status' => false, 'code' => 405,  'message' => 'Invalid Request Type']);

@@ -34,11 +34,11 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
     if(password_verify($password, $user_password) && $email === $user_email ){
 
         $algorithm = "HS256";
-        $secret_key = "s54vdbwjs567sdnsdgsjh3746ejhdhsd3874jfnd44dhdgellkgi5l";
+        $secret_key = "s5ZS5tgjh";
         $issuer_claim = "http://localhost/";
         $issuedat_claim = time();
         $notbefore_claim = $issuedat_claim + 10;
-        $expire_claim = $issuedat_claim + 180;
+        $expire_claim = $issuedat_claim + 120;
 
         $token = [
             "iss" => $issuer_claim,
